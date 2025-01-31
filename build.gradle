@@ -90,8 +90,18 @@ java {
 }
 
 jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
+	from sourceSets.launch.output, sourceSets.api.output
+
+	preserveFileTimestamps = false
+	reproducibleFileOrder = true
+
+	manifest {
+		attributes(
+				'MixinConfigs': 'mixins.automatone.json',
+
+				'Implementation-Title': 'Automatone',
+				'Implementation-Version': project.version
+		)
 	}
 }
 
