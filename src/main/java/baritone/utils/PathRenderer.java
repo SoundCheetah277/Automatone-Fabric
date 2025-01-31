@@ -29,12 +29,12 @@ import baritone.api.utils.interfaces.IGoalRenderPos;
 import baritone.render.ClientPathingBehaviour;
 import baritone.render.RenderedPath;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormats;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -191,7 +191,7 @@ public final class PathRenderer implements IRenderer {
         double vpZ = posZ();
         boolean renderPathAsFrickinThingy = !settings.renderPathAsLine.get();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionProgram);
         buffer.begin(renderPathAsFrickinThingy ? VertexFormat.DrawMode.DEBUG_LINE_STRIP : VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         buffer.vertex((float) (x1 + 0.5D - vpX), (float) (y1 + 0.5D - vpY), (float) (z1 + 0.5D - vpZ)).color(State.red, State.green, State.blue, State.alpha).next();
         buffer.vertex((float) (x2 + 0.5D - vpX), (float) (y2 + 0.5D - vpY), (float) (z2 + 0.5D - vpZ)).color(State.red, State.green, State.blue, State.alpha).next();
@@ -318,7 +318,7 @@ public final class PathRenderer implements IRenderer {
         renderHorizontalQuad(minX, maxX, minZ, maxZ, y1);
         renderHorizontalQuad(minX, maxX, minZ, maxZ, y2);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         buffer.vertex((float) minX, (float) minY, (float) minZ).color(State.red, State.green, State.blue, State.alpha).next();
         buffer.vertex((float) minX, (float) maxY, (float) minZ).color(State.red, State.green, State.blue, State.alpha).next();
@@ -335,7 +335,7 @@ public final class PathRenderer implements IRenderer {
 
     private static void renderHorizontalQuad(double minX, double maxX, double minZ, double maxZ, double y) {
         if (y != 0) {
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
             buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
             buffer.vertex((float) minX, (float) y, (float) minZ).color(State.red, State.green, State.blue, State.alpha).next();
             buffer.vertex((float) maxX, (float) y, (float) minZ).color(State.red, State.green, State.blue, State.alpha).next();

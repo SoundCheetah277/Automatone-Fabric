@@ -46,8 +46,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.CheckForNull;
-
 public class FakeClientPlayerEntity extends OtherClientPlayerEntity implements AutomatoneFakePlayer {
     protected PlayerListEntry listEntry;
 
@@ -88,7 +86,7 @@ public class FakeClientPlayerEntity extends OtherClientPlayerEntity implements A
     }
 
     @Override
-    public void setDisplayProfile(@CheckForNull GameProfile profile) {
+    public void setDisplayProfile(@Nullable GameProfile profile) {
         this.setPlayerListEntry(profile);
     }
 

@@ -33,8 +33,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,14 +56,14 @@ public final class BlockOptionalMeta {
     private static final Pattern pattern = Pattern.compile("^(.+?)(?::(\\d+))?$");
     private static final Map<Block, List<Item>> drops = new HashMap<>();
 
-    public BlockOptionalMeta(ServerWorld world, @Nonnull Block block) {
+    public BlockOptionalMeta(ServerWorld world, @NotNull Block block) {
         this.block = block;
         this.blockstates = getStates(block);
         this.stateHashes = getStateHashes(blockstates);
         this.stackHashes = getStackHashes(world, blockstates);
     }
 
-    public BlockOptionalMeta(ServerWorld world, @Nonnull String selector) {
+    public BlockOptionalMeta(ServerWorld world, @NotNull String selector) {
         Matcher matcher = pattern.matcher(selector);
 
         if (!matcher.find()) {
@@ -78,7 +78,7 @@ public final class BlockOptionalMeta {
         stackHashes = getStackHashes(world, blockstates);
     }
 
-    private static Set<BlockState> getStates(@Nonnull Block block) {
+    private static Set<BlockState> getStates(@NotNull Block block) {
         return new HashSet<>(block.getStateManager().getStates());
     }
 
@@ -103,11 +103,11 @@ public final class BlockOptionalMeta {
         return block;
     }
 
-    public boolean matches(@Nonnull Block block) {
+    public boolean matches(@NotNull Block block) {
         return block == this.block;
     }
 
-    public boolean matches(@Nonnull BlockState blockstate) {
+    public boolean matches(@NotNull BlockState blockstate) {
         Block block = blockstate.getBlock();
         return block == this.block && stateHashes.contains(blockstate.hashCode());
     }
@@ -150,7 +150,7 @@ public final class BlockOptionalMeta {
                             .addOptional(LootContextParameters.BLOCK_ENTITY, null)
                             .add(LootContextParameters.BLOCK_STATE, block.getDefaultState())
                             .build(LootContextTypes.BLOCK))
-                        .withRandomSeed(world.getSeed())
+                        .random(world.getSeed())
                         .build(null),
                     stack -> items.add(stack.getItem())
                 );

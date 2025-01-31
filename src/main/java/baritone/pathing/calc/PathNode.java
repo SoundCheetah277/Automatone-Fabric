@@ -21,8 +21,6 @@ import baritone.api.pathing.goals.Goal;
 import baritone.api.pathing.movement.ActionCosts;
 import baritone.api.utils.BetterBlockPos;
 
-import javax.annotation.Nonnegative;
-
 /**
  * A node in the path, containing the cost and steps to get to it.
  *
@@ -54,7 +52,7 @@ public final class PathNode {
      * <p>Mutable and changed by PathFinder
      * <p>Cannot be negative, as it is impossible to store oxygen indefinitely
      */
-    @Nonnegative
+
     public double oxygenCost;
 
     /**

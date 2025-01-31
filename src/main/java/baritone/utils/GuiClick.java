@@ -19,16 +19,12 @@ package baritone.utils;
 
 import baritone.api.BaritoneAPI;
 import baritone.api.utils.BetterBlockPos;
-import com.mojang.blaze3d.glfw.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -66,13 +62,13 @@ public class GuiClick extends Screen {
         this.callerUuid = callerUuid;
     }
 
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
+//    @Override
+//    public boolean isPauseScreen() {
+//        return false;
+//    }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    public void render(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
         MinecraftClient mc = MinecraftClient.getInstance();
         double mx = mc.mouse.getX();
         double my = mc.mouse.getY();
@@ -133,7 +129,7 @@ public class GuiClick extends Screen {
 
     public void onRender(MatrixStack modelViewStack, Matrix4f projectionMatrix) {
         this.projectionViewMatrix = new Matrix4f(projectionMatrix);
-        this.projectionViewMatrix.mul(modelViewStack.peek().getModel());
+        this.projectionViewMatrix.mul(modelViewStack.peek().getPositionMatrix());
         this.projectionViewMatrix.invert();
 
         if (currentMouseOver != null) {
@@ -146,7 +142,7 @@ public class GuiClick extends Screen {
                 RenderSystem.enableBlend();
                 RenderSystem.blendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
                 RenderSystem.lineWidth(BaritoneAPI.getGlobalSettings().pathRenderLineWidthPixels.get());
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
+                RenderSystem.setShader(GameRenderer::getPositionProgram);
                 RenderSystem.depthMask(false);
                 RenderSystem.disableDepthTest();
                 BetterBlockPos a = new BetterBlockPos(currentMouseOver);

@@ -148,7 +148,7 @@ public interface MovementHelper extends ActionCosts {
         if (block instanceof DoorBlock || block instanceof FenceGateBlock) {
             // Because there's no nice method in vanilla to check if a door is openable or not, we just have to assume
             // that all wooden doors are openable and vice versa.
-            return block instanceof FenceGateBlock || DoorBlock.isWoodenDoor(state);
+            return block instanceof FenceGateBlock || DoorBlock.canOpenByHand(state);
         }
         if (block instanceof CarpetBlock) {
             return canWalkOn(bsi, x, y - 1, z, settings);
@@ -263,7 +263,7 @@ public interface MovementHelper extends ActionCosts {
         if (block == Blocks.LARGE_FERN || block == Blocks.TALL_GRASS) {
             return true;
         }
-        return state.materialReplaceable();
+        return state.isReplaceable();
     }
 
     @Deprecated

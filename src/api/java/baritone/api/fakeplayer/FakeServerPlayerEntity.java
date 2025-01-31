@@ -64,7 +64,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.CheckForNull;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -82,7 +81,7 @@ public class FakeServerPlayerEntity extends ServerPlayerEntity implements Automa
         ((IEntityAccessor)this).automatone$setType(type);
         this.setStepHeight(0.6f); // same step height as LivingEntity
         // Side effects go brr
-        new ServerPlayNetworkHandler(world.getServer(), new ClientConnection(NetworkSide.S2C), this);
+        new ServerPlayNetworkHandler(world.getServer(), new ClientConnection(NetworkSide.CLIENTBOUND), this);
     }
 
     public void selectHotbarSlot(int hotbarSlot) {
@@ -204,7 +203,7 @@ public class FakeServerPlayerEntity extends ServerPlayerEntity implements Automa
         return this.displayProfile;
     }
 
-    public void setDisplayProfile(@CheckForNull GameProfile profile) {
+    public void setDisplayProfile(@Nullable GameProfile profile) {
         if (!Objects.equals(profile, this.displayProfile)) {
             this.displayProfile = profile;
             this.sendProfileUpdatePacket();

@@ -22,6 +22,7 @@ import io.github.ladysnake.elmendorf.ElmendorfTestContext;
 import io.github.ladysnake.elmendorf.GameTestUtil;
 import io.github.ladysnake.elmendorf.impl.MockClientConnection;
 import io.github.ladysnake.otomaton.mixin.ServerWorldAccessor;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -47,16 +48,16 @@ import org.quiltmc.qsl.testing.api.game.QuiltGameTest;
 
 import java.util.List;
 
-public class OtomatonTestSuite implements QuiltGameTest {
+public class OtomatonTestSuite implements FabricGameTest {
     @BeforeBatch(batchId = "sleepingBatch")
     public void beforeSleepingTests(ServerWorld world) {
         world.setTimeOfDay(20000);
         world.calculateAmbientDarkness();   // refreshes light info for sleeping
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE, batchId = "sleepingBatch")
+    @GameTest(templateName = EMPTY_STRUCTURE, batchId = "sleepingBatch")
     public void shellsDoNotPreventSleeping(TestContext ctx) {
-        ServerPlayerEntity player = ((ElmendorfTestContext) ctx).spawnServerPlayer(1, 0, 1);
+        ServerPlayerEntity player = ctx.spawnServerPlayer(1, 0, 1);
         ServerPlayerEntity fakePlayer = new FakeServerPlayerEntity(Otomaton.FAKE_PLAYER, ctx.getWorld());
         fakePlayer.copyPositionAndRotation(player);
         ctx.getWorld().spawnEntity(fakePlayer);

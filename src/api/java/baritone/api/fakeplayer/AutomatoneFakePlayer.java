@@ -36,9 +36,9 @@ package baritone.api.fakeplayer;
 
 import baritone.api.IBaritone;
 import com.mojang.authlib.GameProfile;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.CheckForNull;
 import java.util.UUID;
 
 /**
@@ -52,7 +52,7 @@ import java.util.UUID;
 public interface AutomatoneFakePlayer {
     @Nullable GameProfile getDisplayProfile();
 
-    void setDisplayProfile(@CheckForNull GameProfile profile);
+    void setDisplayProfile(@NotNull GameProfile profile);
 
     @Nullable
     default UUID getOwnerUuid() {

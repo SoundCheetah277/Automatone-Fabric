@@ -28,6 +28,7 @@ import baritone.selection.SelectionRenderer;
 import baritone.utils.GuiClick;
 import baritone.utils.PathRenderer;
 import com.mojang.authlib.GameProfile;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
@@ -41,8 +42,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import org.quiltmc.loader.api.ModContainer;
-import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -79,7 +78,7 @@ public final class AutomatoneClient implements ClientModInitializer {
     }
 
     @Override
-    public void onInitializeClient(ModContainer mod) {
+    public void onInitializeClient() {
         WorldRenderEvents.BEFORE_DEBUG_RENDER.register(AutomatoneClient::onRenderPass);
         ClientPlayNetworking.registerGlobalReceiver(ClickCommand.OPEN_CLICK_SCREEN, (client, handler, buf, responseSender) -> {
             UUID uuid = buf.readUuid();
@@ -125,7 +124,7 @@ public final class AutomatoneClient implements ClientModInitializer {
         P other = FakeClientPlayerEntity.createClientFakePlayer(playerType, world, new GameProfile(uuid, name));
         other.setId(id);
         other.setPosition(x, y, z);
-        other.getPacketPositionCodec().setPos(new Vec3d(x, y, z));
+        other.setPos(x,y,z);
         other.bodyYaw = headYaw;
         other.prevBodyYaw = headYaw;
         other.headYaw = headYaw;

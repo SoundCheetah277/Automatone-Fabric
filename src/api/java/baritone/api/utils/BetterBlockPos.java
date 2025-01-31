@@ -21,8 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A better BlockPos that has fewer hash collisions (and slightly more performant offsets)
@@ -203,7 +202,7 @@ public final class BetterBlockPos extends BlockPos {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public String toString() {
         return String.format(
                 "BetterBlockPos{x=%s,y=%s,z=%s}",
