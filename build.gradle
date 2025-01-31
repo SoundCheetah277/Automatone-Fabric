@@ -47,6 +47,15 @@ repositories {
 	}
 }
 
+loom {
+	mods {
+		"automatone" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.api
+		}
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
