@@ -17,9 +17,9 @@
   "icon": "assets/automatone/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": "baritone.Automatone",
-    "client": "baritone.AutomatoneClient",
-    "cardinal-components": "baritone.AutomatoneComponents"
+    "main": ["baritone.Automatone"],
+    "client": ["baritone.AutomatoneClient"],
+    "cardinal-components": ["baritone.AutomatoneComponents"]
   },
   "mixins": [
     "mixins.automatone.json"
