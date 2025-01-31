@@ -32,6 +32,9 @@ import baritone.command.manager.BaritoneCommandManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.Message;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -180,8 +183,8 @@ public final class DefaultCommands {
     private static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(CommandManager.literal("automatone")
                 .requires(s -> s.hasPermissionLevel(2))
-                .then(CommandManager.argument("command", BaritoneArgumentType.baritone()).executes(command ->
-                        runCommand(command.getSource(), command.getSource().getEntityOrThrow(), BaritoneArgumentType.getCommand(command, "command"))))
+                .then(CommandManager.argument("command", StringArgumentType.string()).executes(command ->
+                        runCommand(command.getSource(), command.getSource().getEntityOrThrow(), command.getArgument("command", String.class))))
         );
     }
 
