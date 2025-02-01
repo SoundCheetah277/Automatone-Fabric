@@ -22,6 +22,7 @@ import baritone.api.utils.IInputOverrideHandler;
 import baritone.api.utils.input.Input;
 import baritone.behavior.Behavior;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -99,6 +100,9 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
         }
 
         LivingEntity entity = this.ctx.entity();
+
+        float speed = entity.getMovementSpeed();
+
         entity.sidewaysSpeed = 0.0F;
         entity.forwardSpeed = 0.0F;
         entity.setSneaking(false);
@@ -106,25 +110,25 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
         entity.setJumping(this.isInputForcedDown(Input.JUMP)); // oppa gangnam style
 
         if (this.isInputForcedDown(Input.MOVE_FORWARD)) {
-            entity.forwardSpeed++;
+            entity.forwardSpeed += speed;
         }
 
         if (this.isInputForcedDown(Input.MOVE_BACK)) {
-            entity.forwardSpeed--;
+            entity.forwardSpeed -= speed;
         }
 
         if (this.isInputForcedDown(Input.MOVE_LEFT)) {
-            entity.sidewaysSpeed++;
+            entity.sidewaysSpeed += speed;
         }
 
         if (this.isInputForcedDown(Input.MOVE_RIGHT)) {
-            entity.sidewaysSpeed--;
+            entity.sidewaysSpeed -= speed;
         }
 
         if (this.isInputForcedDown(Input.SNEAK)) {
             entity.setSneaking(true);
-            entity.sidewaysSpeed *= 0.3D;
-            entity.forwardSpeed *= 0.3D;
+            entity.sidewaysSpeed *= 0.3F;
+            entity.forwardSpeed *= 0.3F;
         }
 
         blockBreakHelper.tick(isInputForcedDown(Input.CLICK_LEFT));
