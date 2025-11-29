@@ -36,7 +36,7 @@ public class Otomaton implements ModInitializer {
     public static final String MOD_ID = "otomaton";
 
     public static Identifier id(String path) {
-        return new Identifier(MOD_ID, path);
+        return Identifier.of(MOD_ID, path);
     }
 
     public static final EntityType<PlayerEntity> FAKE_PLAYER = FabricEntityTypeBuilder.<PlayerEntity>createLiving()
