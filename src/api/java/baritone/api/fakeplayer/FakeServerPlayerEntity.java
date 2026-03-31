@@ -53,7 +53,7 @@ import net.minecraft.network.NetworkSide;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -225,7 +225,7 @@ public class FakeServerPlayerEntity extends ServerPlayerEntity implements Automa
     public void writeCustomDataToNbt(NbtCompound tag) {
         super.writeCustomDataToNbt(tag);
         if (this.displayProfile != null) {
-            tag.put("automatone:display_profile", NbtHelper.writeGameProfile(new NbtCompound(), this.displayProfile));
+            tag.put("automatone:display_profile", NbtHelper.putDataVersion(new NbtCompound()));
         }
         tag.putFloat("head_yaw", this.headYaw);
     }

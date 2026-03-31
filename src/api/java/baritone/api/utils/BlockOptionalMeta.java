@@ -24,13 +24,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTables;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
@@ -137,7 +138,7 @@ public final class BlockOptionalMeta {
     // TODO check if erasing the metadata of both the block and the drops is a good idea
     private static synchronized List<Item> drops(ServerWorld world, Block b) {
         return drops.computeIfAbsent(b, block -> {
-            Identifier lootTableLocation = block.getLootTableId();
+            RegistryKey<LootTable> lootTableLocation = block.getLootTableKey();
             if (lootTableLocation == LootTables.EMPTY) {
                 return Collections.emptyList();
             } else {
