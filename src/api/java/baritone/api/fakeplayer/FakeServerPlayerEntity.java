@@ -37,9 +37,7 @@ package baritone.api.fakeplayer;
 import baritone.api.utils.IEntityAccessor;
 import com.google.common.base.Preconditions;
 import com.mojang.authlib.GameProfile;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -47,14 +45,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkSide;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -77,11 +76,11 @@ public class FakeServerPlayerEntity extends ServerPlayerEntity implements Automa
     }
 
     public FakeServerPlayerEntity(EntityType<? extends PlayerEntity> type, ServerWorld world, GameProfile profile) {
-        super(world.getServer(), world, profile);
+        super(world.getServer(), world, profile, SyncedClientOptions.createDefault());
         ((IEntityAccessor)this).automatone$setType(type);
-        this.setStepHeight(0.6f); // same step height as LivingEntity
         // Side effects go brr
-        new ServerPlayNetworkHandler(world.getServer(), new ClientConnection(NetworkSide.CLIENTBOUND), this);
+        ConnectedClientData data = ConnectedClientData.createDefault(profile, false);
+        new ServerPlayNetworkHandler(world.getServer(), new ClientConnection(NetworkSide.CLIENTBOUND), this, data);
     }
 
     public void selectHotbarSlot(int hotbarSlot) {
@@ -213,8 +212,9 @@ public class FakeServerPlayerEntity extends ServerPlayerEntity implements Automa
     @Override
     public void readCustomDataFromNbt(NbtCompound tag) {
         super.readCustomDataFromNbt(tag);
-        if (tag.contains("automatone:display_profile", NbtType.COMPOUND)) {
-            this.displayProfile = NbtHelper.toGameProfile(tag.getCompound("automatone:display_profile"));
+        if (tag.contains("automatone:display_profile")) {
+            NbtCompound profileTag = tag.getCompound("automatone:display_profile");
+            this.displayProfile = new GameProfile(profileTag.getUuid("Id"), profileTag.getString("Name"));
         }
         if (tag.contains("head_yaw")) {
             this.headYaw = tag.getFloat("head_yaw");
@@ -225,50 +225,58 @@ public class FakeServerPlayerEntity extends ServerPlayerEntity implements Automa
     public void writeCustomDataToNbt(NbtCompound tag) {
         super.writeCustomDataToNbt(tag);
         if (this.displayProfile != null) {
-            tag.put("automatone:display_profile", NbtHelper.putDataVersion(new NbtCompound()));
+            NbtCompound profileTag = new NbtCompound();
+            profileTag.putUuid("Id", this.displayProfile.getId());
+            profileTag.putString("Name", this.displayProfile.getName());
+            tag.put("automatone:display_profile", profileTag);
         }
         tag.putFloat("head_yaw", this.headYaw);
     }
 
-    @Override
-    public Packet<ClientPlayPacketListener> createSpawnPacket() {
-        PacketByteBuf buf = PacketByteBufs.create();
-        writeToSpawnPacket(buf);
-        return new CustomPayloadS2CPacket(FakePlayers.SPAWN_PACKET_ID, buf);
-    }
-
-    protected void writeToSpawnPacket(PacketByteBuf buf) {
-        buf.writeVarInt(this.getId());
-        buf.writeUuid(this.getUuid());
-        buf.writeVarInt(Registries.ENTITY_TYPE.getRawId(this.getType()));
-        buf.writeString(this.getGameProfile().getName());
-        buf.writeDouble(this.getX());
-        buf.writeDouble(this.getY());
-        buf.writeDouble(this.getZ());
-        buf.writeByte((byte)((int)(this.getYaw() * 256.0F / 360.0F)));
-        buf.writeByte((byte)((int)(this.getPitch() * 256.0F / 360.0F)));
-        buf.writeByte((byte)((int)(this.headYaw * 256.0F / 360.0F)));
-        writeProfile(buf, this.getDisplayProfile());
-    }
-
-    public void sendProfileUpdatePacket() {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeVarInt(this.getId());
-        writeProfile(buf, this.getDisplayProfile());
-
-        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(FakePlayers.PROFILE_UPDATE_PACKET_ID, buf);
-
-        for (ServerPlayerEntity e : PlayerLookup.tracking(this)) {
-            e.networkHandler.sendPacket(packet);
-        }
+    public Packet<?> createSpawnPacket() {
+        return new CustomPayloadS2CPacket(
+                new FakePlayerSpawnPayload(
+                this.getId(),
+                this.getUuid(),
+                Registries.ENTITY_TYPE.getRawId(this.getType()),
+                this.getGameProfile().getName(),
+                this.getX(), this.getY(), this.getZ(),
+                (byte) ((int)(this.getYaw() * 256.0 / 360.0)),
+                (byte) ((int)(this.getPitch() * 256.0 / 360.0)),
+                (byte) ((int)(this.headYaw * 256.0 / 360.0))
+        ));
     }
 
     public static void writeProfile(PacketByteBuf buf, @Nullable GameProfile profile) {
         buf.writeBoolean(profile != null);
-
         if (profile != null) {
             buf.writeUuid(profile.getId());
             buf.writeString(profile.getName());
+        }
+    }
+
+    public static @Nullable GameProfile readProfile(PacketByteBuf buf) {
+        boolean present = buf.readBoolean();
+        return present ? new GameProfile(buf.readUuid(), buf.readString()) : null;
+    }
+
+    public record FakePlayerProfileUpdatePayload(int entityId, @Nullable GameProfile displayProfile)
+            implements CustomPayload {
+        public static final CustomPayload.Id<FakePlayerProfileUpdatePayload> ID =
+                new CustomPayload.Id<>(FakePlayers.PROFILE_UPDATE_PACKET_ID);
+
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return ID;
+        }
+    }
+
+    public void sendProfileUpdatePacket() {
+        CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(
+                new FakePlayerProfileUpdatePayload(this.getId(), this.displayProfile)
+        );
+        for (ServerPlayerEntity e : PlayerLookup.tracking(this)) {
+            e.networkHandler.sendPacket(packet);
         }
     }
 }
