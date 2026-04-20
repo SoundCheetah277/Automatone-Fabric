@@ -37,7 +37,7 @@ public class Selection implements ISelection {
                 max.z - min.z + 1
         );
 
-        this.aabb = new Box(this.min, this.max.add(1, 1, 1));
+        this.aabb = new Box(this.min);
     }
 
     @Override
